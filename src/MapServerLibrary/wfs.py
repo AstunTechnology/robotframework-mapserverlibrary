@@ -20,6 +20,12 @@ class WFSKeywords(object):
         self._srsname=srsname
 
     def get_feature_count(self, typename, **kwargs):
+        """Examples
+
+        | ${result}= | MapServerLibrary.Get Feature Count | Secondary_Schools_OGC |
+        | Should Be Equal As Integers | ${result} | 140 |
+        
+        """
         wfs_ds = self._get_ds(typename, kwargs)
         layer = wfs_ds.GetLayerByName(typename)
         return layer.GetFeatureCount()
