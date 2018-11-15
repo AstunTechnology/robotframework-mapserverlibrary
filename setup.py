@@ -17,7 +17,7 @@
 
 """Setup script for Robot's MapServer distributions"""
 
-from distutils.core import setup
+from setuptools import setup
 
 #import sys, os, setuptools
 
@@ -32,7 +32,7 @@ def main():
           description  = 'MapServer utility library for Robot Framework',
           author       = 'Jonathan Lake-Thomas',
           author_email = 'jonathanlakethomas@astuntechnology.com',
-          url          = 'https://github.com/Robotframework-MapServer-Library',
+          url          = 'https://github.com/AstunTechnology/robotframework-mapserverlibrary',
           package_dir  = { '' : 'src'},
           packages     = ['MapServerLibrary']
           )
