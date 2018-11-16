@@ -34,7 +34,8 @@ def main():
           author_email = 'jonathanlakethomas@astuntechnology.com',
           url          = 'https://github.com/AstunTechnology/robotframework-mapserverlibrary',
           package_dir  = { '' : 'src'},
-          packages     = ['MapServerLibrary']
+          packages     = ['MapServerLibrary'],
+          install_requires = ['GDAL>=2.3.2']
           )
         
 
