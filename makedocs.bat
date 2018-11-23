@@ -1,0 +1,1 @@
+python -m robot.libdoc MapServerLibrary MapServerLibrary.html
