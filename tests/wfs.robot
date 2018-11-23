@@ -9,9 +9,9 @@ Documentation     WFS Based Tests using keyword-driven testing approach.
 
 | *** Test Cases *** |
 | Test basic WFS Request |
-|                   | ${result}= | MapServerLibrary.Get Feature Count | Secondary_Schools_OGC |
+|                   | ${result}= | MapServerLibrary.WFS.Get Feature Count | Secondary_Schools_OGC |
 |                   | Should Be Equal As Integers | ${result} | 140 |
 
 | Test WFS with SQL Filter |
-|                   | ${result}= | MapServerLibrary.Get Feature Count | Secondary_Schools_OGC | Secondary_Schools_OGC_sql=${TestSQL} | x=y |
+|                   | ${result}= | MapServerLibrary.WFS.Get Feature Count | Secondary_Schools_OGC | Secondary_Schools_OGC_sql | ${TestSQL} |
 |                   | Should Be Equal As Integers | ${result} | 12 |

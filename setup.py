@@ -19,11 +19,6 @@
 
 from setuptools import setup
 
-#import sys, os, setuptools
-
-#sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
-
-#from MapServerLibrary import __version__
 __version__ = '0.1'
 
 def main():
@@ -35,7 +30,7 @@ def main():
           url          = 'https://github.com/AstunTechnology/robotframework-mapserverlibrary',
           package_dir  = { '' : 'src'},
           packages     = ['MapServerLibrary'],
-          install_requires = ['GDAL>=2.3.2']
+          install_requires = ['GDAL>=2.3.2','requests>=2.2.0','requests_ntlm>=1.1.0', 'urllib3']
           )
         
 
