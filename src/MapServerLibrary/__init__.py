@@ -4,7 +4,7 @@ from osgeo import ogr, osr, gdal
 from robot.api.deco import keyword
 import urllib.parse
 import requests
-from requests import Session, Request
+from MapServerLibrary.HTTPRequests import make_request
 
 class MapServerLibrary(object):
 
@@ -38,18 +38,6 @@ class MapServerLibrary(object):
             self._username = username
             self._password = password
 
-    @keyword('WFS.Get Feature Count')
-    def get_feature_count(self, typename, sql_filter_key=None, sql_filter_value=None, version="1.1.0", srsname="EPSG:27700"):
-        """Examples
-
-        | ${result}= | MapServerLibrary.Get Feature Count | Secondary_Schools_OGC |
-        | Should Be Equal As Integers | ${result} | 140 |
-        
-        """
-        wfs_ds = self._get_ds(typename, sql_filter_key, sql_filter_value, version, srsname)
-        layer = wfs_ds.GetLayerByName(typename)
-        return layer.GetFeatureCount()
-    
     def _get_ds(self, typename, sql_filter_key, sql_filter_value, version, srsname):
         if self._username:
             gdal.SetConfigOption('GDAL_HTTP_AUTH', 'NTLM')
@@ -63,6 +51,10 @@ class MapServerLibrary(object):
         wfs_ds = ogr.Open('WFS:' + wfs_url)
         print(wfs_url)
         return wfs_ds
+
+    def get_file_contents(self, url):
+        r = requests.get(url, stream=True)
+        return r.content
         
     @keyword('WFS.Get Features')
     def get_features(self, typename, sql_filter_key=None, sql_filter_value=None, version="1.1.0", srsname="EPSG:27700"):
@@ -128,13 +120,62 @@ class MapServerLibrary(object):
                 if param_value != '':
                     parameters[param.upper()] = param_value
 
-        session = Session()
-        if self._username is not None and self._password is not None:
-            session.auth = HttpNtlmAuth(self._username, self._password)
-        req = Request('GET', self._webservice_url, params=parameters)
-        prepped = session.prepare_request(req)
-        resp = session.send(prepped)
+        resp = make_request('GET', self._webservice_url, parameters=parameters, data={}, headers={}, username=self._username, password=self._password)
     
         return resp
+
+    @keyword('WFS.Get Feature Count')
+    def get_feature_count(self, typename, sql_filter_key=None, sql_filter_value=None, version="1.1.0", srsname="EPSG:27700"):
+        """Examples
+
+        | ${result}= | MapServerLibrary.Get Feature Count | Secondary_Schools_OGC |
+        | Should Be Equal As Integers | ${result} | 140 |
+        
+        """
+        wfs_ds = self._get_ds(typename, sql_filter_key, sql_filter_value, version, srsname)
+        layer = wfs_ds.GetLayerByName(typename)
+        return layer.GetFeatureCount()
+
+    @keyword('WMS.Get Map png Post')
+    def get_map_png_post(   self, layers, 
+                            bbox, width, height,
+                            version='1.1.0', srs='EPSG:27700',  
+                            mapsource='',
+                            styles='', transparent='', 
+                            bgcolor='', exceptions='',
+                            time='', elevation='',
+                            sld_url='', sld_body='', 
+                            wfs='', name='',
+                            clientid='',nocache=''):
+
+        """ Makes a getmap request to a given URL which may contain mapserver parameters. Remaining parameters can be
+            sent via a POST request. If a URL is passed through the sld_url parameter, then the sld file contents
+            will be pulled from there and passed into sld_body.
+        """
+
+        parameters = {
+                    'REQUEST': 'GetMap', 'FORMAT': 'image/png',
+                    'LAYERS': layers, 'VERSION': version,
+                    'SRS': srs, 'WIDTH' : width, 
+                    'HEIGHT': height, 'BBOX': bbox
+        }
+
+        optional_params = [
+                    'mapsource', 'styles', 'transparent', 'bgcolor', 'exceptions',
+                    'time', 'elevation', 'sld_body', 'sld_url', 'wfs', 'name', 'clientid', 'nocache'
+        ]
+
+        for param in optional_params:
+            param_value = vars()[param]
+            if param_value != '':
+                parameters[param.upper()] = param_value
+
+        if 'SLD_URL' in parameters:
+            parameters['SLD_BODY'] = self.get_file_contents(parameters['SLD_URL'])
+            del parameters['SLD_URL']
+            
+        req = make_request('POST', self._webservice_url, parameters={}, data=parameters, headers={}, username=self._username, password=self._password)
+
+        return req
     
     ROBOT_LIBRARY_SCOPE = 'GLOBAL'
