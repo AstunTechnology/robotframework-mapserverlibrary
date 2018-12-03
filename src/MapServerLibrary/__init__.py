@@ -4,7 +4,7 @@ from osgeo import ogr, osr, gdal
 from robot.api.deco import keyword
 import urllib.parse
 import requests
-from MapServerLibrary.HTTPRequests import make_request
+from MapServerLibrary.HTTPRequest import make_request
 
 class MapServerLibrary(object):
 
