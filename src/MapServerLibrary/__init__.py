@@ -94,7 +94,8 @@ class MapServerLibrary(object):
                     exceptions='', time='', 
                     elevation='',sld='', 
                     wfs='', name='',
-                    clientid='',nocache=''):
+                    clientid='',nocache='',
+                    **kwargs):
         
         """ Makes a getmap request to return a response object containing details about the image retrieved
 
@@ -119,6 +120,10 @@ class MapServerLibrary(object):
                 param_value = vars()[param]
                 if param_value != '':
                     parameters[param.upper()] = param_value
+
+        #Add any kwargs for template params
+        for key, value in kwargs.items():
+            parameters[key] = value
 
         resp = make_request('GET', self._webservice_url, parameters=parameters, data={}, headers={}, username=self._username, password=self._password)
     
@@ -146,7 +151,8 @@ class MapServerLibrary(object):
                             time='', elevation='',
                             sld_url='', sld_body='', 
                             wfs='', name='',
-                            clientid='',nocache=''):
+                            clientid='',nocache='',
+                            **kwargs):
 
         """ Makes a getmap request to a given URL which may contain mapserver parameters. Remaining parameters can be
             sent via a POST request. If a URL is passed through the sld_url parameter, then the sld file contents
@@ -173,6 +179,10 @@ class MapServerLibrary(object):
         if 'SLD_URL' in parameters:
             parameters['SLD_BODY'] = self.get_file_contents(parameters['SLD_URL'])
             del parameters['SLD_URL']
+
+        #Add any kwargs for template params
+        for key, value in kwargs.items():
+            parameters[key] = value
             
         req = make_request('POST', self._webservice_url, parameters={}, data=parameters, headers={}, username=self._username, password=self._password)
 
