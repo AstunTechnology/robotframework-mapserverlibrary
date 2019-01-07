@@ -129,6 +129,22 @@ class MapServerLibrary(object):
     
         return resp
 
+    @keyword('WMS.Get Legend Graphic')
+    def get_legend_graphic( self, layer, format):
+        """Examples
+
+        | ${result}= | MapServerLibrary.Get Legend Graphic | Secondary_Schools_OGC | image/png |
+
+        """
+ 
+        parameters = {
+            'REQUEST': 'GetLegendGraphic', 'FORMAT': format , 'LAYER': layer, 'MAP': self._map_file
+        }
+
+        resp = make_request('GET', self._webservice_url, parameters=parameters, data={}, headers={}, username=self._username, password=self._password)
+
+        return resp
+
     @keyword('WFS.Get Feature Count')
     def get_feature_count(self, typename, sql_filter_key=None, sql_filter_value=None, version="1.1.0", srsname="EPSG:27700"):
         """Examples
