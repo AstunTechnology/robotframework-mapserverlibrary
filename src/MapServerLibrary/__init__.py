@@ -138,7 +138,8 @@ class MapServerLibrary(object):
         """
  
         parameters = {
-            'REQUEST': 'GetLegendGraphic', 'FORMAT': format , 'LAYER': layer, 'MAP': self._map_file
+            'REQUEST': 'GetLegendGraphic', 'FORMAT': format , 'LAYER': layer, 'MAP': self._map_file,
+            'SERVICE': 'WMS', 'VERSION': '1.1.0'
         }
 
         resp = make_request('GET', self._webservice_url, parameters=parameters, data={}, headers={}, username=self._username, password=self._password)
