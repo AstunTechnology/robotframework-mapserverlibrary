@@ -137,10 +137,10 @@ class MapServerLibrary(object):
 
         """
 
-        return self._mapserver_post( layers=layer, bbox='', 
+        return self._mapserver_post( layers='', bbox='', 
                                      width='', height='',
                                      service='WMS', request= 'GetLegendGraphic', format='image/png', sld_url = sld_url,
-                                     version=version, srs=srs
+                                     version=version, srs=srs, layer=layer
                                      )
 
     @keyword('WFS.Get Feature Count')
