@@ -207,7 +207,7 @@ class MapServerLibrary(object):
         optional_params = [
                     'mapsource', 'styles', 'transparent', 'bgcolor', 'exceptions',
                     'time', 'elevation', 'sld_body', 'sld_url', 'wfs', 'name', 'clientid', 'nocache',
-                    'layers', 'layer', 'width', 'height', 'bbox'
+                    'layers', 'width', 'height', 'bbox'
         ]
 
         for param in optional_params:
