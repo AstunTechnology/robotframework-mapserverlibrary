@@ -171,13 +171,39 @@ class MapServerLibrary(object):
                             clientid='',nocache='',
                             **kwargs):
 
+        return self._mapserver_post( layers=layers, bbox=bbox, 
+                                     width=width, height=height,
+                                     service='WMS', request= 'GetMap', format='image/png',
+                                     version=version, srs=srs,
+                                     mapsource=mapsource,
+                                     styles=styles, transparent=transparent,
+                                     bgcolor=bgcolor, exceptions=exceptions,
+                                     time=time, elevation=elevation,
+                                     sld_url=sld_url, sld_body=sld_body,
+                                     wfs=wfs, name=name,
+                                     clientid=clientid, nocache=nocache,
+                                     **kwargs=**kwargs)
+        
+    def _mapserver_post(  self, layers, 
+                          bbox, width, height,
+                          service, request, format,
+                          version='1.1.0', srs='EPSG:27700',  
+                          mapsource='',
+                          styles='', transparent='', 
+                          bgcolor='', exceptions='',
+                          time='', elevation='',
+                          sld_url='', sld_body='', 
+                          wfs='', name='',
+                          clientid='',nocache='',
+                          **kwargs):
+
         """ Makes a getmap request to a given URL which may contain mapserver parameters. Remaining parameters can be
             sent via a POST request. If a URL is passed through the sld_url parameter, then the sld file contents
             will be pulled from there and passed into sld_body.
         """
 
         parameters = {
-                    'REQUEST': 'GetMap', 'FORMAT': 'image/png',
+                    'REQUEST': request, 'FORMAT': format, 'SERVICE': service,
                     'LAYERS': layers, 'VERSION': version,
                     'SRS': srs, 'WIDTH' : width, 
                     'HEIGHT': height, 'BBOX': bbox
