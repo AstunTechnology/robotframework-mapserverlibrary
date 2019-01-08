@@ -137,8 +137,7 @@ class MapServerLibrary(object):
 
         """
 
-        return self._mapserver_post( layers='', bbox='', 
-                                     width='', height='',
+        return self._mapserver_post( 
                                      service='WMS', request= 'GetLegendGraphic', format='image/png', sld_url = sld_url,
                                      version=version, srs=srs, layer=layer
                                      )
@@ -201,14 +200,13 @@ class MapServerLibrary(object):
 
         parameters = {
                     'REQUEST': request, 'FORMAT': format, 'SERVICE': service,
-                    'LAYERS': layers, 'VERSION': version,
-                    'SRS': srs, 'WIDTH' : width, 
-                    'HEIGHT': height, 'BBOX': bbox
-        }
+                    'VERSION': version,
+                    'SRS': srs }
 
         optional_params = [
                     'mapsource', 'styles', 'transparent', 'bgcolor', 'exceptions',
-                    'time', 'elevation', 'sld_body', 'sld_url', 'wfs', 'name', 'clientid', 'nocache'
+                    'time', 'elevation', 'sld_body', 'sld_url', 'wfs', 'name', 'clientid', 'nocache',
+                    'layers', 'layer', 'width', 'height', 'bbox'
         ]
 
         for param in optional_params:
