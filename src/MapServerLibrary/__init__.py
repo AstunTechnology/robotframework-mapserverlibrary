@@ -180,8 +180,7 @@ class MapServerLibrary(object):
                                      clientid=clientid, nocache=nocache,
                                      **kwargs)
         
-    def _mapserver_post(  self, layers, 
-                          bbox, width, height,
+    def _mapserver_post(  self, 
                           service, request, format,
                           version='1.1.0', srs='EPSG:27700',
                           layers='', bbox='', width='', height='',  
