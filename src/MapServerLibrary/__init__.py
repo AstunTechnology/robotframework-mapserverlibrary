@@ -183,7 +183,8 @@ class MapServerLibrary(object):
     def _mapserver_post(  self, layers, 
                           bbox, width, height,
                           service, request, format,
-                          version='1.1.0', srs='EPSG:27700',  
+                          version='1.1.0', srs='EPSG:27700',
+                          layers='', bbox='', width='', height=''  
                           mapsource='',
                           styles='', transparent='', 
                           bgcolor='', exceptions='',
