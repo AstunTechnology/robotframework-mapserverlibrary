@@ -182,7 +182,7 @@ class MapServerLibrary(object):
                                      sld_url=sld_url, sld_body=sld_body,
                                      wfs=wfs, name=name,
                                      clientid=clientid, nocache=nocache,
-                                     **kwargs=**kwargs)
+                                     **kwargs)
         
     def _mapserver_post(  self, layers, 
                           bbox, width, height,
