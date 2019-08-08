@@ -1,11 +1,13 @@
 __version__ = '0.1'
 
 from osgeo import ogr, osr, gdal
+from robot.api import logger
 from robot.api.deco import keyword
 import urllib.parse
 import requests
 import re
 from MapServerLibrary.HTTPRequest import make_request
+
 
 class MapServerLibrary(object):
 
@@ -45,7 +47,7 @@ class MapServerLibrary(object):
             gdal.SetConfigOption('GDAL_HTTP_USERPWD',self._username + ':' + self._password)
         wfs_url = self._mapserver_url + "VERSION=" + version + "&SRSNAME=" + srsname + "&SERVICE=WFS&REQUEST=GETFEATURE"
         if typename:
-            wfs_url += "&TYPENAME=" + typename 
+            wfs_url += "&TYPENAME=" + typename
         wfs_url += "&MAP=" + self._map_file
         if sql_filter_key:
             wfs_url += "&" + sql_filter_key + "=" + urllib.parse.quote_plus(sql_filter_value)
@@ -59,13 +61,13 @@ class MapServerLibrary(object):
 
     @keyword('Is Mapserver Installed')
     def is_mapserver_installed(self):
-        """Makes an empty request to mapserver to ensure 
+        """Makes an empty request to mapserver to ensure
         it is installed and configured correctly
-        
+
         Example:
         | | ${installed}= | MapServerLibrary.Is Mapserver Installed |
         | | Should Be True | ${installed} |"""
-        
+
         req = make_request('GET', self._mapserver_url, username=self._username, password=self._password)
         if req.status_code != 200:
             return False
@@ -100,6 +102,10 @@ class MapServerLibrary(object):
 
         return { "major": versionSplit[0], "minor": versionSplit[1], "point": versionSplit[2] }
 
+    @keyword('Browse')
+    def browse(self, mapfile="", x=None, y=None, layers=""):
+        pass
+
     @keyword('Query')
     def query(self, mapfile="", x=None, y=None, layers="", tolerance=0.1, template=""):
             """Makes a mapserver query request"""
@@ -120,7 +126,7 @@ class MapServerLibrary(object):
 
             return resp.text
 
-    @keyword('NQuery')
+    @keyword('Nquery')
     def nquery(self, mapfile="", x=None, y=None, mapshape="", layers="", tolerance=0.1, template=""):
             """Makes a mapserver NQuery request"""
 
@@ -142,6 +148,85 @@ class MapServerLibrary(object):
 
             return resp.text
 
+    @keyword('Itemquery')
+    def itemquery(self, mapfile="", query="", field="", layer="", tolerance=0.1, template=""):
+            """Makes a mapserver ItemQuery request"""
+
+            parameters = {
+                "mode": "itemquery",
+                "map": mapfile,
+                "qlayer": layer,
+            }
+
+            parameters["map.layer[{0}]".format(layer)] = "TOLERANCE {0} TEMPLATE '{1}' TOLERANCEUNITS METERS".format(tolerance, template)
+
+            if query is not None and field is not None:
+                parameters["qstring"] = "{0}='{1}'".format(field, query)
+
+            resp = make_request("GET", self._mapserver_url, parameters=parameters, username=self._username, password=self._password)
+
+            return resp.text
+
+    # @keyword('Itemnquery')
+    # def itemnquery(self, mapfile="", query="", layers="", tolerance=0.1, template=""):
+    #         """Makes a mapserver ItemNQuery request"""
+
+    #         parameters = {
+    #             "mode": "itemnquery",
+    #             "map": mapfile,
+    #             "layers": layers,
+    #         }
+
+    #         for layer in layers.split(','):
+    #             parameters["map.layer[{0}]".format(layer)] = "TOLERANCE {0} TEMPLATE '{1}' TOLERANCEUNITS METERS".format(tolerance, template)
+
+    #         if query is not None:
+    #             parameters["query"] = query
+
+    #         resp = make_request("GET", self._mapserver_url, parameters=parameters, username=self._username, password=self._password)
+
+    #         return resp.text
+
+    # @keyword('Featurequery')
+    # def itemquery(self, mapfile="", query="", layers="", tolerance=0.1, template=""):
+    #         """Makes a mapserver FeatureQuery request"""
+
+    #         parameters = {
+    #             "mode": "featurequery",
+    #             "map": mapfile,
+    #             "layers": layers,
+    #         }
+
+    #         for layer in layers.split(','):
+    #             parameters["map.layer[{0}]".format(layer)] = "TOLERANCE {0} TEMPLATE '{1}' TOLERANCEUNITS METERS".format(tolerance, template)
+
+    #         if query is not None:
+    #             parameters["query"] = query
+
+    #         resp = make_request("GET", self._mapserver_url, parameters=parameters, username=self._username, password=self._password)
+
+    #         return resp.text
+
+    # @keyword('Featurenquery')
+    # def itemnquery(self, mapfile="", query="", layers="", tolerance=0.1, template=""):
+    #         """Makes a mapserver FeatureNQuery request"""
+
+    #         parameters = {
+    #             "mode": "featurenquery",
+    #             "map": mapfile,
+    #             "layers": layers,
+    #         }
+
+    #         for layer in layers.split(','):
+    #             parameters["map.layer[{0}]".format(layer)] = "TOLERANCE {0} TEMPLATE '{1}' TOLERANCEUNITS METERS".format(tolerance, template)
+
+    #         if query is not None:
+    #             parameters["query"] = query
+
+    #         resp = make_request("GET", self._mapserver_url, parameters=parameters, username=self._username, password=self._password)
+
+    #         return resp.text
+
     @keyword('WFS.Get Features')
     def get_features(self, typename, sql_filter_key=None, sql_filter_value=None, version="1.1.0", srsname="EPSG:27700"):
         """Examples
@@ -153,14 +238,14 @@ class MapServerLibrary(object):
         while True:
             feature = layer.GetNextFeature()
             if feature is None:
-                break 
+                break
             features.append(feature)
         return features
 
     @keyword('WFS.Get Layers')
     def get_layers(self, version="1.1.0", srsname="EPSG:27700"):
         """Examples
-        | ${result}= | MapServerLibrary.Get Layers | 
+        | ${result}= | MapServerLibrary.Get Layers |
         """
         wfs_ds = self._get_ds(None, version, srsname)
         layers = []
@@ -172,17 +257,17 @@ class MapServerLibrary(object):
         return layers
 
     @keyword('WMS.Get Map png')
-    def get_map_png(self, layers, 
+    def get_map_png(self, layers,
                     bbox, width, height,
-                    version="1.1.0", srs="EPSG:27700", 
-                    mapsource='', styles='', 
-                    transparent='', bgcolor='', 
-                    exceptions='', time='', 
-                    elevation='',sld='', 
+                    version="1.1.0", srs="EPSG:27700",
+                    mapsource='', styles='',
+                    transparent='', bgcolor='',
+                    exceptions='', time='',
+                    elevation='',sld='',
                     wfs='', name='',
                     clientid='',nocache='',
                     **kwargs):
-        
+
         """ Makes a getmap request to return a response object containing details about the image retrieved
 
         Examples:
@@ -192,7 +277,7 @@ class MapServerLibrary(object):
         parameters = {
             'REQUEST': 'GetMap', 'FORMAT': 'image/png',
             'LAYERS': layers, 'VERSION': version,
-            'SRS': srs, 'WIDTH' : width, 
+            'SRS': srs, 'WIDTH' : width,
             'HEIGHT': height, 'BBOX': bbox,
             'MAP': self._map_file
         }
@@ -212,7 +297,7 @@ class MapServerLibrary(object):
             parameters[key] = value
 
         resp = make_request('GET', self._mapserver_url, parameters=parameters, data={}, headers={}, username=self._username, password=self._password)
-    
+
         return resp
 
     @keyword('WMS.Get Legend Graphic png')
@@ -223,7 +308,7 @@ class MapServerLibrary(object):
 
         """
 
-        return self._mapserver_post( 
+        return self._mapserver_post(
                                      service='WMS', request= 'GetLegendGraphic', format='image/png', sld_url = sld_url,
                                      version=version, srs=srs, layer=layer
                                      )
@@ -234,26 +319,26 @@ class MapServerLibrary(object):
 
         | ${result}= | MapServerLibrary.Get Feature Count | Secondary_Schools_OGC |
         | Should Be Equal As Integers | ${result} | 140 |
-        
+
         """
         wfs_ds = self._get_ds(typename, sql_filter_key, sql_filter_value, version, srsname)
         layer = wfs_ds.GetLayerByName(typename)
         return layer.GetFeatureCount()
 
     @keyword('WMS.Get Map png Post')
-    def get_map_png_post(   self, layers, 
+    def get_map_png_post(   self, layers,
                             bbox, width, height,
-                            version='1.1.0', srs='EPSG:27700',  
+                            version='1.1.0', srs='EPSG:27700',
                             mapsource='',
-                            styles='', transparent='', 
+                            styles='', transparent='',
                             bgcolor='', exceptions='',
                             time='', elevation='',
-                            sld_url='', sld_body='', 
+                            sld_url='', sld_body='',
                             wfs='', name='',
                             clientid='',nocache='',
                             **kwargs):
 
-        return self._mapserver_post( layers=layers, bbox=bbox, 
+        return self._mapserver_post( layers=layers, bbox=bbox,
                                      width=width, height=height,
                                      service='WMS', request= 'GetMap', format='image/png',
                                      version=version, srs=srs,
@@ -265,16 +350,16 @@ class MapServerLibrary(object):
                                      wfs=wfs, name=name,
                                      clientid=clientid, nocache=nocache,
                                      **kwargs)
-        
-    def _mapserver_post(  self, 
+
+    def _mapserver_post(  self,
                           service, request, format,
                           version='1.1.0', srs='EPSG:27700',
-                          layers='', bbox='', width='', height='',  
+                          layers='', bbox='', width='', height='',
                           mapsource='',
-                          styles='', transparent='', 
+                          styles='', transparent='',
                           bgcolor='', exceptions='',
                           time='', elevation='',
-                          sld_url='', sld_body='', 
+                          sld_url='', sld_body='',
                           wfs='', name='',
                           clientid='',nocache='',
                           **kwargs):
@@ -307,9 +392,9 @@ class MapServerLibrary(object):
         #Add any kwargs for template params
         for key, value in kwargs.items():
             parameters[key] = value
-            
+
         req = make_request('POST', self._mapserver_url, parameters={}, data=parameters, headers={}, username=self._username, password=self._password)
 
         return req
-    
+
     ROBOT_LIBRARY_SCOPE = 'GLOBAL'
