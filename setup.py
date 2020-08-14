@@ -19,7 +19,7 @@
 
 from setuptools import setup
 
-__version__ = '0.1.9'
+__version__ = '0.1.10'
 
 def main():
     setup(name         = 'robotframework-mapserverlibrary',
@@ -32,7 +32,7 @@ def main():
           packages     = ['MapServerLibrary'],
           install_requires = ['GDAL>=2.3.2','requests>=2.2.0','requests_ntlm>=1.1.0', 'urllib3']
           )
-        
+
 
 if __name__ == "__main__":
     main()
