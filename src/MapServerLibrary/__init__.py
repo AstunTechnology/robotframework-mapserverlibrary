@@ -53,6 +53,12 @@ class MapServerLibrary(object):
             wfs_url += "&" + sql_filter_key + "=" + urllib.parse.quote_plus(sql_filter_value)
         wfs_ds = ogr.Open('WFS:' + wfs_url)
         print(wfs_url)
+        print(wfs_ds)
+
+        if wfs_ds is None:
+            resp = HTTPRequest.make_request("GET", wfs_url)
+            print(resp)
+
         return wfs_ds
 
     def get_file_contents(self, url):
