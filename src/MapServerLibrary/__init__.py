@@ -376,7 +376,7 @@ class MapServerLibrary(object):
         """
 
         parameters = {
-                    'REQUEST': request, 'FORMAT': format, 'SERVICE': service,
+                    'MAP': self._map_file, 'REQUEST': request, 'FORMAT': format, 'SERVICE': service,
                     'VERSION': version,
                     'SRS': srs }
 

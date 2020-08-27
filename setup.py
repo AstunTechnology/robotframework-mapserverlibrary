@@ -19,7 +19,7 @@
 
 from setuptools import setup
 
-__version__ = '0.1.10'
+__version__ = '0.1.11'
 
 def main():
     setup(name         = 'robotframework-mapserverlibrary',
