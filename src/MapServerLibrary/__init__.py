@@ -167,7 +167,8 @@ class MapServerLibrary(object):
             parameters["map.layer[{0}]".format(layer)] = "TOLERANCE {0} TEMPLATE '{1}' TOLERANCEUNITS METERS".format(tolerance, template)
 
             if query is not None and field is not None:
-                parameters["qstring"] = "{0}='{1}'".format(field, query)
+                parameters["qstring"] = query
+                parameters["qitem"] = field
 
             resp = make_request("GET", self._mapserver_url, parameters=parameters, username=self._username, password=self._password)
 
